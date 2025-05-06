@@ -1,0 +1,179 @@
+{
+  "spell": [
+    {
+      "name": "Flowering",
+      "source": "KBP",
+      "page": 62,
+      "level": 2,
+      "school": "Transmutation",
+      "time": [
+        {
+          "number": 1,
+          "unit": "action"
+        }
+      ],
+      "range": {
+        "type": "point",
+        "distance": {
+          "type": "feet",
+          "amount": 60
+        }
+      },
+      "components": {
+        "v": true,
+        "s": true,
+        "m": "a handful of seeds"
+      },
+      "duration": [
+        {
+          "type": "concentration",
+          "amount": 1,
+          "unit": "minute"
+        }
+      ],
+      "entries": [
+        "You cause plants in the area to bloom with unnatural speed and beauty. Choose a point within range. All plant life in a 20-foot-radius sphere centered on that point instantly sprouts colorful flowers and thick foliage.",
+        "For the duration, the area is difficult terrain for creatures other than you, and the flowers lightly obscure the area. You can dismiss the effect early as a bonus action.",
+        "At Higher Levels. When you cast this spell using a spell slot of 3rd level or higher, the radius increases by 5 feet for each slot level above 2nd."
+      ]
+    },
+    {
+      "name": "Darkened Flame",
+      "source": "KBP",
+      "page": 62,
+      "level": 1,
+      "school": "Evocation",
+      "time": [
+        {
+          "number": 1,
+          "unit": "action"
+        }
+      ],
+      "range": {
+        "type": "point",
+        "distance": {
+          "type": "feet",
+          "amount": 30
+        }
+      },
+      "components": {
+        "v": true,
+        "s": true,
+        "m": "a small piece of charcoal"
+      },
+      "duration": [
+        {
+          "type": "instant"
+        }
+      ],
+      "entries": [
+        "A flickering flame appears in your hand, shedding dim light in a 10-foot radius. You can throw this flame at a creature within range, dealing fire damage.",
+        "The flame can also be used as a light source in dark areas, casting dim light in a 10-foot radius."
+      ]
+    },
+    {
+      "name": "Ebon Shadow",
+      "source": "KBP",
+      "page": 62,
+      "level": 2,
+      "school": "Necromancy",
+      "time": [
+        {
+          "number": 1,
+          "unit": "action"
+        }
+      ],
+      "range": {
+        "type": "point",
+        "distance": {
+          "type": "feet",
+          "amount": 60
+        }
+      },
+      "components": {
+        "v": true,
+        "s": true
+      },
+      "duration": [
+        {
+          "type": "concentration",
+          "amount": 1,
+          "unit": "minute"
+        }
+      ],
+      "entries": [
+        "You summon a dark shadow that takes the form of a smoky tendril and latches onto a target within range. The target is slowed by the shadow’s grip and can’t take reactions.",
+        "The shadow lasts for a duration of 1 minute or until the target takes damage."
+      ]
+    },
+    {
+      "name": "Tidal Surge",
+      "source": "KBP",
+      "page": 62,
+      "level": 3,
+      "school": "Conjuration",
+      "time": [
+        {
+          "number": 1,
+          "unit": "action"
+        }
+      ],
+      "range": {
+        "type": "point",
+        "distance": {
+          "type": "feet",
+          "amount": 120
+        }
+      },
+      "components": {
+        "v": true,
+        "s": true,
+        "m": "a drop of water"
+      },
+      "duration": [
+        {
+          "type": "instant"
+        }
+      ],
+      "entries": [
+        "You call upon the power of the ocean to send a surge of water towards your enemies. Choose a point within range. The water moves in a 20-foot-long, 10-foot-wide line, pushing creatures along the line.",
+        "Creatures caught in the surge must make a Strength saving throw or be knocked prone and pushed back."
+      ]
+    },
+    {
+      "name": "Waves of Despair",
+      "source": "KBP",
+      "page": 62,
+      "level": 4,
+      "school": "Necromancy",
+      "time": [
+        {
+          "number": 1,
+          "unit": "action"
+        }
+      ],
+      "range": {
+        "type": "point",
+        "distance": {
+          "type": "feet",
+          "amount": 60
+        }
+      },
+      "components": {
+        "v": true,
+        "s": true
+      },
+      "duration": [
+        {
+          "type": "concentration",
+          "amount": 1,
+          "unit": "minute"
+        }
+      ],
+      "entries": [
+        "You conjure waves of dark energy that wash over your enemies. Creatures within a 20-foot radius of the chosen point must make a Wisdom saving throw.",
+        "On a failed save, creatures are frightened and take psychic damage. On a successful save, they take half damage and are not frightened."
+      ]
+    }
+  ]
+}

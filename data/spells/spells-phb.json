@@ -21103,6 +21103,102 @@
 			"areaTags": [
 				"S"
 			]
+		},
+		{
+			"name": "Spore Hallucination",
+			"source": "Homebrew",
+			"page": 0,
+			"srd": true,
+			"reprintedAs": [],
+			"level": 0,
+			"school": "M",
+			"time": [
+				{
+					"number": 1,
+					"unit": "action"
+				}
+			],
+			"range": {
+				"type": "point",
+				"distance": {
+					"type": "feet",
+					"amount": 30
+				}
+			},
+			"components": {
+				"v": true,
+				"s": true,
+				"m": "Material component description"
+			},
+			"duration": [
+				{
+					"type": "timed",
+					"duration": {
+						"type": "minute",
+						"amount": 1
+					}
+				}
+			],
+			"entries": [
+				"Due to your prolonged exposure to the Spores.",
+				"You can manipulate someones vision to see things that are not there",
+				"They cannot touch the thing, but will be confused as to why it is there",
+				"Only affects creates with an intelligence of 8 or higher that aren't undead, contructs, or elementals.",
+				"You can perform this action a number of times equal to your proficiency bonus, and regain all expended uses when you finish a long rest."
+			],
+			"savingThrow": [
+				"Saving throw type (if applicable)"
+			],
+			"areaTags": [
+				"Tag 1", "Tag 2"
+			]
+		},
+		{
+			"name": "Spore Communication",
+			"source": "Mushroom",
+			"page": 0,
+			"srd": true,
+			"reprintedAs": [],
+			"level": 0,
+			"school": "M",
+			"time": [
+				{
+					"number": 1,
+					"unit": "bonus"
+				}
+			],
+			"range": {
+				"type": "point",
+				"distance": {
+					"type": "feet",
+					"amount": 20
+				}
+			},
+			"components": {
+				"v": true,
+				"s": false,
+				"m": "none"
+			},
+			"duration": [
+				{
+					"type": "timed",
+					"duration": {
+						"type": "minute",
+						"amount": 20
+					}
+				}
+			],
+			"entries": [
+				"Due to your prolonged exposure to the Spores.",
+				"You can communicate telepathically with any creature within 20 feet of you that has an Intelligence of 4 or higher. You can only communicate in a language you know, and the target must be able to understand that language.",
+				"This is a one way communication. You can speak to someone but they cannot telepathically speak back to you (unless they also have this)"
+			],
+			"savingThrow": [
+				"none"
+			],
+			"areaTags": [
+				"Tag 1", "Tag 2"
+			]
 		}
 	]
 }

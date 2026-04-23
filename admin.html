@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homebrew Admin &mdash; 5etools</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#e8e8e8;margin:0;padding:24px;max-width:860px}
+h1{color:#e6b800;margin:0 0 4px}
+.sub{color:#777;margin:0 0 20px;font-size:.9em}
+a{color:#e6b800}
+
+/* Config panel */
+#cfg-panel{background:#202038;border:1px solid #3a3a5c;border-radius:6px;padding:18px 20px;margin-bottom:22px}
+#cfg-panel h2{color:#e6b800;margin:0 0 14px;font-size:1em}
+#cfg-panel .row{display:flex;gap:12px;flex-wrap:wrap}
+#cfg-panel .fg{flex:1;min-width:160px}
+#cfg-close{float:right;background:none;border:none;color:#888;font-size:1.2em;cursor:pointer;line-height:1}
+#cfg-close:hover{color:#ccc}
+
+/* Tabs */
+.tabs{display:flex;gap:2px;border-bottom:2px solid #333;margin-bottom:20px}
+.tab-btn{padding:8px 22px;background:none;border:none;color:#888;cursor:pointer;font-size:.95em;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab-btn:hover{color:#ccc}
+.tab-btn.active{color:#e6b800;border-bottom-color:#e6b800}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Messages */
+.msg{padding:10px 14px;border-radius:4px;margin-bottom:16px;display:none}
+.msg.visible{display:block}
+.ok{background:#1a3a1a;border-left:4px solid #4a9a4a}
+.err{background:#3a1a1a;border-left:4px solid #9a4a4a;color:#f99}
+.info{background:#1a2a3a;border-left:4px solid #4a7a9a;color:#adf}
+
+/* Forms */
+.form-group{margin-bottom:14px}
+label{display:block;margin-bottom:4px;font-size:.8em;color:#aaa;text-transform:uppercase;letter-spacing:.05em}
+input[type=text],input[type=number],input[type=password],select,textarea{
+  width:100%;padding:8px 10px;background:#252540;border:1px solid #3a3a5c;
+  color:#eee;border-radius:4px;font-size:.95em}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#e6b800}
+textarea{height:110px;resize:vertical;font-family:inherit}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>.form-group{flex:1;min-width:120px}
+.cb-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:4px}
+.cb-row label{display:flex;align-items:center;gap:6px;text-transform:none;font-size:.9em;color:#ccc;margin:0;cursor:pointer}
+.cb-row input[type=checkbox]{width:auto}
+.class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+.class-grid label{display:flex;align-items:center;gap:6px;font-size:.88em;text-transform:none;color:#ccc;cursor:pointer;margin:0}
+.class-grid input[type=checkbox]{width:auto}
+.sep{border:none;border-top:1px solid #2a2a4e;margin:18px 0}
+.submit-btn{background:#e6b800;color:#1a1a2e;border:none;padding:10px 28px;font-size:1em;font-weight:bold;border-radius:4px;cursor:pointer;margin-top:6px}
+.submit-btn:hover:not(:disabled){background:#ffd000}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+h2{color:#e6b800;font-size:1.05em;margin:0 0 16px}
+.hidden{display:none}
+#settings-btn{float:right;background:none;border:1px solid #3a3a5c;color:#888;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:.85em}
+#settings-btn:hover{color:#ccc;border-color:#666}
+
+/* Brew list */
+.brew-list{width:100%;border-collapse:collapse;margin-top:8px}
+.brew-list th{background:#252540;text-align:left;padding:8px 12px;font-size:.8em;color:#aaa;text-transform:uppercase}
+.brew-list td{padding:8px 12px;border-bottom:1px solid #252540;font-size:.9em;vertical-align:middle}
+.brew-list tr:hover td{background:#202035}
+.del-btn{background:#5a1a1a;color:#f88;border:1px solid #7a2a2a;padding:3px 10px;border-radius:3px;cursor:pointer;font-size:.8em}
+.del-btn:hover{background:#7a2a2a}
+.reload-btn{background:#252540;color:#aaa;border:1px solid #3a3a5c;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:.85em;margin-bottom:12px}
+.reload-btn:hover{color:#eee}
+</style>
+</head>
+<body>
+
+<h1>Homebrew Admin</h1>
+<p class="sub">Add spells &amp; items to your 5etools site. Changes go live within ~1 minute via GitHub Pages.
+  <button id="settings-btn" onclick="toggleCfg()">&#9881; Settings</button>
+</p>
+
+<!-- Config / Setup panel -->
+<div id="cfg-panel">
+  <h2>GitHub Settings <button id="cfg-close" onclick="toggleCfg()" title="Close">&times;</button></h2>
+  <p style="color:#777;font-size:.85em;margin:0 0 12px">
+    Needs a GitHub <a href="https://github.com/settings/tokens/new?description=5etools-homebrew&scopes=repo" target="_blank" rel="noopener">Personal Access Token</a>
+    with <strong>Contents: Read &amp; Write</strong> permission. Stored only in your browser's localStorage.
+  </p>
+  <div class="row">
+    <div class="fg form-group">
+      <label for="cfg-owner">Repo Owner</label>
+      <input type="text" id="cfg-owner" placeholder="AlexStraughan">
+    </div>
+    <div class="fg form-group">
+      <label for="cfg-repo">Repo Name</label>
+      <input type="text" id="cfg-repo" placeholder="5etools-v2.8.3">
+    </div>
+    <div class="fg form-group">
+      <label for="cfg-branch">Branch</label>
+      <input type="text" id="cfg-branch" placeholder="main">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cfg-token">Personal Access Token</label>
+    <input type="password" id="cfg-token" placeholder="github_pat_...">
+  </div>
+  <button class="submit-btn" onclick="saveCfg()">Save Settings</button>
+</div>
+
+<div id="msg" class="msg"></div>
+
+<div class="tabs">
+  <button class="tab-btn" data-tab="spell" onclick="showTab('spell',this)">Add Spell</button>
+  <button class="tab-btn" data-tab="item"  onclick="showTab('item',this)">Add Item</button>
+  <button class="tab-btn" data-tab="list"  onclick="showTab('list',this)">Current Homebrew</button>
+</div>
+
+<!-- ── SPELL FORM ─────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-spell">
+  <form id="spell-form" onsubmit="submitSpell(event)">
+    <h2>New Spell</h2>
+    <div class="row">
+      <div class="form-group" style="flex:2">
+        <label for="sname">Spell Name *</label>
+        <input type="text" id="sname" name="name" required maxlength="200" placeholder="e.g. Spore Hallucination">
+      </div>
+      <div class="form-group">
+        <label for="level">Level</label>
+        <select id="level" name="level">
+          <option value="0">Cantrip</option>
+          <option value="1">1st</option>
+          <option value="2" selected>2nd</option>
+          <option value="3">3rd</option>
+          <option value="4">4th</option>
+          <option value="5">5th</option>
+          <option value="6">6th</option>
+          <option value="7">7th</option>
+          <option value="8">8th</option>
+          <option value="9">9th</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="school">School</label>
+        <select id="school" name="school">
+          <option value="A">Abjuration</option>
+          <option value="C">Conjuration</option>
+          <option value="D">Divination</option>
+          <option value="E">Enchantment</option>
+          <option value="V">Evocation</option>
+          <option value="I" selected>Illusion</option>
+          <option value="N">Necromancy</option>
+          <option value="T">Transmutation</option>
+        </select>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="row">
+      <div class="form-group">
+        <label for="cast_time">Casting Time</label>
+        <select id="cast_time" name="cast_time" onchange="tog('cast_cond_grp',this.value==='reaction')">
+          <option value="action">1 Action</option>
+          <option value="bonus">1 Bonus Action</option>
+          <option value="reaction">1 Reaction</option>
+          <option value="1minute">1 Minute</option>
+          <option value="10minute">10 Minutes</option>
+          <option value="1hour">1 Hour</option>
+          <option value="8hour">8 Hours</option>
+        </select>
+      </div>
+      <div class="form-group hidden" id="cast_cond_grp">
+        <label for="cast_condition">Reaction Condition</label>
+        <input type="text" id="cast_condition" name="cast_condition" maxlength="200" placeholder="which you take when...">
+      </div>
+      <div class="form-group">
+        <label for="range_type">Range</label>
+        <select id="range_type" name="range_type" onchange="tog('range_dist_grp',this.value==='feet'||this.value==='miles')">
+          <option value="self">Self</option>
+          <option value="touch">Touch</option>
+          <option value="feet" selected>Feet</option>
+          <option value="miles">Miles</option>
+          <option value="sight">Sight</option>
+          <option value="unlimited">Unlimited</option>
+          <option value="special">Special</option>
+        </select>
+      </div>
+      <div class="form-group" id="range_dist_grp">
+        <label for="range_dist">Distance</label>
+        <input type="number" id="range_dist" name="range_dist" value="60" min="1" max="99999">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Components</label>
+      <div class="cb-row">
+        <label><input type="checkbox" name="comp_v" value="on" checked> V — Verbal</label>
+        <label><input type="checkbox" name="comp_s" value="on" checked> S — Somatic</label>
+        <label><input type="checkbox" name="comp_m" value="on" onchange="tog('comp_m_grp',this.checked)"> M — Material</label>
+      </div>
+    </div>
+    <div class="form-group hidden" id="comp_m_grp">
+      <label for="comp_m_text">Material description</label>
+      <input type="text" id="comp_m_text" name="comp_m_text" maxlength="300" placeholder="e.g. a handful of dried mushroom spores">
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label for="dur_preset">Duration</label>
+        <select id="dur_preset" name="dur_preset" onchange="tog('dur_custom_grp',this.value==='special')">
+          <option value="instantaneous">Instantaneous</option>
+          <option value="1round">1 Round</option>
+          <option value="1minute" selected>1 Minute</option>
+          <option value="10minutes">10 Minutes</option>
+          <option value="1hour">1 Hour</option>
+          <option value="8hours">8 Hours</option>
+          <option value="24hours">24 Hours</option>
+          <option value="dispelled">Until Dispelled</option>
+          <option value="special">Special…</option>
+        </select>
+      </div>
+      <div class="form-group hidden" id="dur_custom_grp">
+        <label for="dur_text">Custom duration text</label>
+        <input type="text" id="dur_text" name="dur_text" maxlength="100">
+      </div>
+      <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:2px">
+        <div class="cb-row"><label><input type="checkbox" name="concentration" value="on"> Concentration</label></div>
+      </div>
+    </div>
+    <hr class="sep">
+    <div class="form-group">
+      <label for="description">Description * <span style="font-size:.9em;color:#555">(blank line = new paragraph)</span></label>
+      <textarea id="description" name="description" required placeholder="The target must make a Constitution saving throw..."></textarea>
+    </div>
+    <div class="form-group">
+      <label for="higher_levels">At Higher Levels <span style="color:#555">(optional)</span></label>
+      <textarea id="higher_levels" name="higher_levels" style="height:65px" placeholder="When you cast this spell using a slot of 3rd level or higher..."></textarea>
+    </div>
+    <hr class="sep">
+    <div class="form-group">
+      <label>Classes <span style="color:#555">(optional)</span></label>
+      <div class="class-grid">
+        <label><input type="checkbox" name="classes" value="Artificer"> Artificer</label>
+        <label><input type="checkbox" name="classes" value="Bard"> Bard</label>
+        <label><input type="checkbox" name="classes" value="Cleric"> Cleric</label>
+        <label><input type="checkbox" name="classes" value="Druid" checked> Druid</label>
+        <label><input type="checkbox" name="classes" value="Paladin"> Paladin</label>
+        <label><input type="checkbox" name="classes" value="Ranger"> Ranger</label>
+        <label><input type="checkbox" name="classes" value="Sorcerer"> Sorcerer</label>
+        <label><input type="checkbox" name="classes" value="Warlock"> Warlock</label>
+        <label><input type="checkbox" name="classes" value="Wizard" checked> Wizard</label>
+      </div>
+    </div>
+    <button type="submit" class="submit-btn" id="spell-submit">Add Spell</button>
+  </form>
+</div>
+
+<!-- ── ITEM FORM ──────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-item">
+  <form id="item-form" onsubmit="submitItem(event)">
+    <h2>New Item</h2>
+    <div class="row">
+      <div class="form-group" style="flex:2">
+        <label for="iname">Item Name *</label>
+        <input type="text" id="iname" name="name" required maxlength="200" placeholder="e.g. Cloak of Mycelium">
+      </div>
+      <div class="form-group">
+        <label for="item_type">Type</label>
+        <select id="item_type" name="item_type">
+          <option value="wondrous" selected>Wondrous Item</option>
+          <option value="potion">Potion</option>
+          <option value="scroll">Scroll</option>
+          <option value="rod">Rod</option>
+          <option value="staff">Staff</option>
+          <option value="wand">Wand</option>
+          <option value="ring">Ring</option>
+          <option value="armor">Armor</option>
+          <option value="weapon">Weapon</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rarity">Rarity</label>
+        <select id="rarity" name="rarity">
+          <option value="none">None</option>
+          <option value="common">Common</option>
+          <option value="uncommon" selected>Uncommon</option>
+          <option value="rare">Rare</option>
+          <option value="very rare">Very Rare</option>
+          <option value="legendary">Legendary</option>
+          <option value="artifact">Artifact</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="cb-row">
+        <label><input type="checkbox" name="req_attune" value="on" onchange="tog('attune_cls_grp',this.checked)"> Requires Attunement</label>
+      </div>
+    </div>
+    <div class="form-group hidden" id="attune_cls_grp">
+      <label for="attune_class">Attunement condition <span style="color:#555">(e.g. "by a wizard")</span></label>
+      <input type="text" id="attune_class" name="attune_class" maxlength="100" placeholder="by a spellcaster">
+    </div>
+    <div class="form-group">
+      <label for="idesc">Description * <span style="font-size:.9em;color:#555">(blank line = new paragraph)</span></label>
+      <textarea id="idesc" name="description" required placeholder="While wearing this item..."></textarea>
+    </div>
+    <button type="submit" class="submit-btn" id="item-submit">Add Item</button>
+  </form>
+</div>
+
+<!-- ── BREW LIST ──────────────────────────────────────────────────────── -->
+<div class="tab-panel" id="tab-list">
+  <h2>Current Homebrew</h2>
+  <button class="reload-btn" onclick="loadList()">&#8635; Refresh</button>
+  <div id="brew-list-content"><p style="color:#666">Loading…</p></div>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────────────
+const CFG_KEY = '5etools_homebrew_cfg';
+
+function getCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch { return null; }
+}
+
+function saveCfg() {
+  const owner  = document.getElementById('cfg-owner').value.trim();
+  const repo   = document.getElementById('cfg-repo').value.trim();
+  const branch = document.getElementById('cfg-branch').value.trim() || 'main';
+  const token  = document.getElementById('cfg-token').value.trim();
+  if (!owner || !repo || !token) { showMsg('Owner, repo and token are all required.', 'err'); return; }
+  localStorage.setItem(CFG_KEY, JSON.stringify({ owner, repo, branch, token }));
+  document.getElementById('cfg-panel').classList.add('hidden');
+  showMsg('Settings saved.', 'ok');
+}
+
+function toggleCfg() {
+  const panel = document.getElementById('cfg-panel');
+  panel.classList.toggle('hidden');
+  if (!panel.classList.contains('hidden')) {
+    const c = getCfg() || {};
+    document.getElementById('cfg-owner').value  = c.owner  || 'AlexStraughan';
+    document.getElementById('cfg-repo').value   = c.repo   || '5etools-v2.8.3';
+    document.getElementById('cfg-branch').value = c.branch || 'main';
+    document.getElementById('cfg-token').value  = c.token  || '';
+  }
+}
+
+// ── UI helpers ───────────────────────────────────────────────────────────────
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = 'msg visible ' + (type || 'info');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  (btn || document.querySelector('[data-tab="' + name + '"]')).classList.add('active');
+  if (name === 'list') loadList();
+}
+
+function tog(id, show) {
+  document.getElementById(id).classList.toggle('hidden', !show);
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.textContent = loading ? 'Saving…' : btn.dataset.label;
+}
+
+// ── GitHub API ───────────────────────────────────────────────────────────────
+const BREW_PATH = 'homebrew/custom-homebrew.json';
+const API_BASE  = 'https://api.github.com';
+
+async function ghFetch(method, path, body, token) {
+  const resp = await fetch(API_BASE + path, {
+    method,
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.message || 'GitHub API error ' + resp.status);
+  }
+  return resp.status === 204 ? null : resp.json();
+}
+
+async function getBrewFile(cfg) {
+  const data    = await ghFetch('GET',
+    `/repos/${cfg.owner}/${cfg.repo}/contents/${BREW_PATH}?ref=${encodeURIComponent(cfg.branch)}`,
+    null, cfg.token);
+  const decoded = JSON.parse(atob(data.content.replace(/\s/g, '')));
+  return { brew: decoded, sha: data.sha };
+}
+
+async function putBrewFile(cfg, brew, sha, commitMsg) {
+  brew._meta.dateLastModified = Math.floor(Date.now() / 1000);
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(brew, null, '\t'))));
+  await ghFetch('PUT',
+    `/repos/${cfg.owner}/${cfg.repo}/contents/${BREW_PATH}`,
+    { message: commitMsg, content: encoded, sha, branch: cfg.branch },
+    cfg.token);
+}
+
+// ── Form data → spell / item objects ────────────────────────────────────────
+const CAST_TIME_MAP = {
+  action:    { number: 1,  unit: 'action'   },
+  bonus:     { number: 1,  unit: 'bonus'    },
+  reaction:  { number: 1,  unit: 'reaction' },
+  '1minute': { number: 1,  unit: 'minute'   },
+  '10minute':{ number: 10, unit: 'minute'   },
+  '1hour':   { number: 1,  unit: 'hour'     },
+  '8hour':   { number: 8,  unit: 'hour'     },
+};
+
+const DUR_MAP = {
+  instantaneous: [{ type: 'instant' }],
+  '1round':      [{ type: 'timed', duration: { type: 'round',  amount: 1  } }],
+  '1minute':     [{ type: 'timed', duration: { type: 'minute', amount: 1  } }],
+  '10minutes':   [{ type: 'timed', duration: { type: 'minute', amount: 10 } }],
+  '1hour':       [{ type: 'timed', duration: { type: 'hour',   amount: 1  } }],
+  '8hours':      [{ type: 'timed', duration: { type: 'hour',   amount: 8  } }],
+  '24hours':     [{ type: 'timed', duration: { type: 'hour',   amount: 24 } }],
+  dispelled:     [{ type: 'permanent', ends: ['dispel'] }],
+};
+
+const ITEM_TYPE_MAP = { potion:'P', scroll:'SC', rod:'RD', staff:'ST', wand:'WD', ring:'RG' };
+
+function fd(form, name)  { return form.elements[name]?.value?.trim() || ''; }
+function fchk(form, name){ return form.elements[name]?.checked; }
+function fall(form, name){ return [...form.querySelectorAll(`[name="${name}"]:checked`)].map(el => el.value); }
+function paragraphs(str) { return str.split(/\n\n+/).map(s => s.trim()).filter(Boolean); }
+
+function buildSpell(form) {
+  const name = fd(form, 'name');
+  if (!name) throw new Error('Spell name is required');
+
+  const level  = parseInt(fd(form, 'level'), 10);
+  const school = fd(form, 'school').toUpperCase();
+
+  const ctKey = fd(form, 'cast_time');
+  const time  = [{ ...(CAST_TIME_MAP[ctKey] || CAST_TIME_MAP.action) }];
+  if (ctKey === 'reaction') {
+    const cond = fd(form, 'cast_condition');
+    if (cond) time[0].condition = cond;
+  }
+
+  const rangeType = fd(form, 'range_type');
+  let range;
+  if      (rangeType === 'self')      range = { type: 'point', distance: { type: 'self'      } };
+  else if (rangeType === 'touch')     range = { type: 'point', distance: { type: 'touch'     } };
+  else if (rangeType === 'sight')     range = { type: 'point', distance: { type: 'sight'     } };
+  else if (rangeType === 'unlimited') range = { type: 'point', distance: { type: 'unlimited' } };
+  else if (rangeType === 'special')   range = { type: 'special' };
+  else {
+    const dist = Math.max(1, parseInt(fd(form, 'range_dist') || '60', 10));
+    range = { type: 'point', distance: { type: rangeType, amount: dist } };
+  }
+
+  const components = {};
+  if (fchk(form, 'comp_v')) components.v = true;
+  if (fchk(form, 'comp_s')) components.s = true;
+  if (fchk(form, 'comp_m')) {
+    const mText = fd(form, 'comp_m_text');
+    components.m = mText || true;
+  }
+
+  const durKey = fd(form, 'dur_preset');
+  const conc   = fchk(form, 'concentration');
+  let duration;
+  if (durKey === 'special') {
+    duration = [{ type: 'special', duration: fd(form, 'dur_text') }];
+  } else {
+    duration = JSON.parse(JSON.stringify(DUR_MAP[durKey] || DUR_MAP.instantaneous));
+    if (conc && duration[0].type === 'timed') duration[0].concentration = true;
+  }
+
+  const rawDesc = fd(form, 'description');
+  if (!rawDesc) throw new Error('Description is required');
+
+  const spell = {
+    name, source: 'CustomBrew', page: 0, level, school,
+    time, range, components, duration,
+    entries: paragraphs(rawDesc),
+  };
+
+  const rawHL = fd(form, 'higher_levels');
+  if (rawHL) spell.entriesHigherLevel = [{ type: 'entries', name: 'At Higher Levels', entries: paragraphs(rawHL) }];
+
+  const classes = fall(form, 'classes');
+  if (classes.length) spell.classes = { fromClassList: classes.map(n => ({ name: n, source: 'PHB' })) };
+
+  return spell;
+}
+
+function buildItem(form) {
+  const name = fd(form, 'name');
+  if (!name) throw new Error('Item name is required');
+
+  const rarity   = fd(form, 'rarity');
+  const itemType = fd(form, 'item_type');
+  const rawDesc  = fd(form, 'description');
+  if (!rawDesc) throw new Error('Description is required');
+
+  const item = { name, source: 'CustomBrew', page: 0, rarity, entries: paragraphs(rawDesc) };
+
+  if (fchk(form, 'req_attune')) {
+    const cls = fd(form, 'attune_class');
+    item.reqAttune = cls || true;
+  }
+
+  if      (itemType === 'wondrous') item.wondrous = true;
+  else if (itemType === 'armor')    item.armor    = true;
+  else if (itemType === 'weapon')   { item.weapon = true; item.type = 'M'; }
+  else if (ITEM_TYPE_MAP[itemType]) item.type = ITEM_TYPE_MAP[itemType];
+
+  return item;
+}
+
+// ── Submit handlers ──────────────────────────────────────────────────────────
+async function submitSpell(e) {
+  e.preventDefault();
+  const cfg = getCfg();
+  if (!cfg) { showMsg('Configure GitHub settings first (⚙ Settings).', 'err'); return; }
+
+  const btn = document.getElementById('spell-submit');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    const spell        = buildSpell(e.target);
+    const { brew, sha } = await getBrewFile(cfg);
+    if (!brew.spell) brew.spell = [];
+    brew.spell.push(spell);
+    await putBrewFile(cfg, brew, sha, `Add spell: ${spell.name}`);
+    showMsg(`✓ "${spell.name}" saved — site will update in ~1 minute.`, 'ok');
+    e.target.reset();
+    tog('range_dist_grp', true);
+  } catch (err) {
+    showMsg('Error: ' + err.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Add Spell';
+  }
+}
+
+async function submitItem(e) {
+  e.preventDefault();
+  const cfg = getCfg();
+  if (!cfg) { showMsg('Configure GitHub settings first (⚙ Settings).', 'err'); return; }
+
+  const btn = document.getElementById('item-submit');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  try {
+    const item          = buildItem(e.target);
+    const { brew, sha } = await getBrewFile(cfg);
+    if (!brew.item) brew.item = [];
+    brew.item.push(item);
+    await putBrewFile(cfg, brew, sha, `Add item: ${item.name}`);
+    showMsg(`✓ "${item.name}" saved — site will update in ~1 minute.`, 'ok');
+    e.target.reset();
+  } catch (err) {
+    showMsg('Error: ' + err.message, 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Add Item';
+  }
+}
+
+// ── Brew list ────────────────────────────────────────────────────────────────
+async function loadList() {
+  const el  = document.getElementById('brew-list-content');
+  const cfg = getCfg();
+  if (!cfg) { el.innerHTML = '<p style="color:#f99">Configure GitHub settings first.</p>'; return; }
+
+  el.innerHTML = '<p style="color:#666">Loading…</p>';
+  try {
+    const { brew, sha } = await getBrewFile(cfg);
+    window._currentBrew = brew;
+    window._currentSha  = sha;
+
+    const spells = brew.spell || [];
+    const items  = brew.item  || [];
+
+    if (!spells.length && !items.length) {
+      el.innerHTML = '<p style="color:#666">No homebrew content yet.</p>';
+      return;
+    }
+
+    const rows = [
+      ...spells.map((s, i) =>
+        `<tr><td>${esc(s.name)}</td><td>Spell</td><td>Level ${s.level} · ${schoolName(s.school)}</td>
+         <td><button class="del-btn" onclick="deleteEntry('spell',${i})">Delete</button></td></tr>`),
+      ...items.map((it, i) =>
+        `<tr><td>${esc(it.name)}</td><td>Item</td><td>${esc(it.rarity || '')}</td>
+         <td><button class="del-btn" onclick="deleteEntry('item',${i})">Delete</button></td></tr>`),
+    ];
+    el.innerHTML = `<table class="brew-list">
+      <thead><tr><th>Name</th><th>Type</th><th>Details</th><th></th></tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>`;
+  } catch (err) {
+    el.innerHTML = `<p style="color:#f99">Failed to load: ${esc(err.message)}</p>`;
+  }
+}
+
+async function deleteEntry(type, idx) {
+  if (!window._currentBrew) return;
+  if (!confirm(`Delete this ${type}?`)) return;
+
+  const cfg = getCfg();
+  if (!cfg) return;
+
+  const brew = window._currentBrew;
+  brew[type].splice(idx, 1);
+
+  try {
+    await putBrewFile(cfg, brew, window._currentSha, `Remove ${type} entry`);
+    showMsg('Deleted — site will update in ~1 minute.', 'ok');
+    loadList();
+  } catch (err) {
+    showMsg('Error: ' + err.message, 'err');
+  }
+}
+
+// ── Utilities ────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const SCHOOL_NAMES = { A:'Abjuration', C:'Conjuration', D:'Divination', E:'Enchantment',
+                       V:'Evocation',  I:'Illusion',    N:'Necromancy', T:'Transmutation' };
+function schoolName(k) { return SCHOOL_NAMES[k] || k; }
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+(function init() {
+  const cfg = getCfg();
+  if (!cfg) {
+    // First visit — pre-fill defaults and leave settings panel open
+    document.getElementById('cfg-owner').value  = 'AlexStraughan';
+    document.getElementById('cfg-repo').value   = '5etools-v2.8.3';
+    document.getElementById('cfg-branch').value = 'main';
+  } else {
+    document.getElementById('cfg-panel').classList.add('hidden');
+  }
+
+  // Init range dist visibility
+  const rt = document.getElementById('range_type');
+  if (rt) tog('range_dist_grp', rt.value === 'feet' || rt.value === 'miles');
+
+  // Default active tab
+  showTab('spell');
+})();
+</script>
+</body>
+</html>

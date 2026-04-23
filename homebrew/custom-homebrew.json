@@ -13,7 +13,7 @@
 			}
 		],
 		"dateAdded": 1745452800,
-		"dateLastModified": 1776983133
+		"dateLastModified": 1776983200
 	},
 	"spell": [
 		{
@@ -289,5 +289,16 @@
 			}
 		}
 	],
-	"item": []
+	"item": [
+		{
+			"name": "Item Alex's Test item!",
+			"source": "CustomBrew",
+			"page": 0,
+			"rarity": "very rare",
+			"entries": [
+				"TEst decsdnoaugrpjeqaghmre"
+			],
+			"wondrous": true
+		}
+	]
 }

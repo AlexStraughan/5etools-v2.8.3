@@ -13,7 +13,7 @@
 			}
 		],
 		"dateAdded": 1745452800,
-		"dateLastModified": 1776982259
+		"dateLastModified": 1776983133
 	},
 	"spell": [
 		{
@@ -206,6 +206,75 @@
 					},
 					{
 						"name": "Sorcerer",
+						"source": "PHB"
+					},
+					{
+						"name": "Warlock",
+						"source": "PHB"
+					},
+					{
+						"name": "Wizard",
+						"source": "PHB"
+					}
+				]
+			}
+		},
+		{
+			"name": "Custom Spell!",
+			"source": "CustomBrew",
+			"page": 0,
+			"level": 5,
+			"school": "V",
+			"time": [
+				{
+					"number": 10,
+					"unit": "minute"
+				}
+			],
+			"range": {
+				"type": "point",
+				"distance": {
+					"type": "miles",
+					"amount": 60
+				}
+			},
+			"components": {
+				"v": true,
+				"s": true
+			},
+			"duration": [
+				{
+					"type": "timed",
+					"duration": {
+						"type": "minute",
+						"amount": 1
+					}
+				}
+			],
+			"entries": [
+				"gfedwhtberwbnoitrbmtew"
+			],
+			"entriesHigherLevel": [
+				{
+					"type": "entries",
+					"name": "At Higher Levels",
+					"entries": [
+						"niogrtewnbgt rlwhtnr;ewoihgntre"
+					]
+				}
+			],
+			"classes": {
+				"fromClassList": [
+					{
+						"name": "Bard",
+						"source": "PHB"
+					},
+					{
+						"name": "Cleric",
+						"source": "PHB"
+					},
+					{
+						"name": "Druid",
 						"source": "PHB"
 					},
 					{
